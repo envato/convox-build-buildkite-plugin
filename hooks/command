@@ -1,0 +1,36 @@
+#!/bin/bash
+set -euo pipefail
+
+convox_rack="$BUILDKITE_PLUGIN_CONVOX_BUILD_RACK"
+convox_app="$BUILDKITE_PLUGIN_CONVOX_BUILD_APP"
+build_metadata_key="${BUILDKITE_PLUGIN_CONVOX_BUILD_METADATA_BUILD_ID:-}"
+release_metadata_key="${BUILDKITE_PLUGIN_CONVOX_BUILD_METADATA_RELEASE_ID:-}"
+
+convox_build_cmd=( convox build --rack="$convox_rack" --app="$convox_app" )
+
+[ "${BUILDKITE_PLUGIN_CONVOX_BUILD_MANIFEST-}" = "" ]    || convox_build_cmd+=( --manifest="$BUILDKITE_PLUGIN_CONVOX_BUILD_MANIFEST" )
+[ "${BUILDKITE_PLUGIN_CONVOX_BUILD_DESCRIPTION-}" = "" ] || convox_build_cmd+=( --description="$BUILDKITE_PLUGIN_CONVOX_BUILD_DESCRIPTION" )
+! "${BUILDKITE_PLUGIN_CONVOX_BUILD_DEVELOPMENT-false}"   || convox_build_cmd+=( --development )
+  "${BUILDKITE_PLUGIN_CONVOX_BUILD_CACHE-true}"          || convox_build_cmd+=( --no-cache )
+
+echo "--- Creating Convox release"
+
+echo '$'" ${convox_build_cmd[*]}"
+convox_build_output="$("${convox_build_cmd[@]}" | tee /dev/stderr)"
+convox_id_output="$(echo "$convox_build_output" | tail -n 5)"
+
+echo "--- Recording metadata values"
+
+if [ "$build_metadata_key" != "" ]; then
+  build_id="$(echo "$convox_id_output" | awk '$1 == "Build:" {print $2}')"
+
+  echo "Setting metadata[$build_metadata_key]=\"$build_id\""
+  buildkite-agent meta-data set "$build_metadata_key" "$build_id"
+fi
+
+if [ "$release_metadata_key" != "" ]; then
+  release_id="$(echo "$convox_id_output" | awk '$1 == "Release:" {print $2}')"
+
+  echo "Setting metadata[$release_metadata_key]=\"$release_id\""
+  buildkite-agent meta-data set "$release_metadata_key" "$release_id"
+fi

@@ -1,0 +1,34 @@
+name: Convox Build
+description: Create a Convox release
+author: https://github.com/liamdawson
+requirements:
+  - convox
+  - awk
+configuration:
+  required:
+    - rack
+    - app
+  additionalProperties: false
+  properties:
+    rack:
+      type: string
+    app:
+      type: string
+    manifest:
+      type: string
+    description:
+      type: string
+    cache:
+      type: boolean
+      default: true
+    development:
+      type: boolean
+      default: false
+    metadata:
+      type: object
+      additionalProperties: false
+      properties:
+        release-id:
+          type: string
+        build-id:
+          type: string
