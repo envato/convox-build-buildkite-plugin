@@ -1,9 +1,6 @@
 # Config for https://github.com/apps/release-drafter
-name-template: 'v$NEXT_MINOR_VERSION'
+name-template: 'v$NEXT_MINOR_VERSION (Optional summary)'
 tag-template: 'v$NEXT_MINOR_VERSION'
-categories:
-  - title: 'Dependency Updates'
-    label: 'dependencies'
 template: |
   ## Changes
 
@@ -15,10 +12,9 @@ template: |
 
   ```diff
   steps:
-    - command: test.sh
-      plugins:
-  -     docker-compose#$PREVIOUS_TAG:
-  +     docker-compose#v$NEXT_MINOR_VERSION:
-          image: someimage
-          workdir: /app
+    - plugins:
+  -     liamdawson/convox-build#$PREVIOUS_TAG:
+  +     liamdawson/convox-build#v$NEXT_MINOR_VERSION:
+          app: someapp
+          rack: somerack
   ```
