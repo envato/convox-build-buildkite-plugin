@@ -15,6 +15,9 @@ convox_build_cmd=( convox build --rack "$convox_rack" --app "$convox_app" )
 
 echo "--- Creating Convox release"
 
+echo stat "$BUILDKITE_PLUGIN_CONVOX_BUILD_MANIFEST"
+stat "$BUILDKITE_PLUGIN_CONVOX_BUILD_MANIFEST" || true
+
 printf "$ " && printf '%q ' "${convox_build_cmd[@]}" && echo
 convox_build_output="$("${convox_build_cmd[@]}" | tee /dev/stderr)"
 convox_id_output="$(echo "$convox_build_output" | tail -n 5)"
