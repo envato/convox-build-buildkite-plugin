@@ -8,15 +8,15 @@ release_metadata_key="${BUILDKITE_PLUGIN_CONVOX_BUILD_METADATA_RELEASE_ID:-}"
 
 convox_build_cmd=( convox build --rack "$convox_rack" --app "$convox_app" )
 
-[ "${BUILDKITE_PLUGIN_CONVOX_BUILD_MANIFEST-}" = "" ]    || convox_build_cmd+=( --manifest "$BUILDKITE_PLUGIN_CONVOX_BUILD_MANIFEST" )
+[ "${BUILDKITE_PLUGIN_CONVOX_BUILD_MANIFEST-}" = "" ]    || convox_build_cmd+=( --manifest "$(pwd)/${BUILDKITE_PLUGIN_CONVOX_BUILD_MANIFEST}" )
 [ "${BUILDKITE_PLUGIN_CONVOX_BUILD_DESCRIPTION-}" = "" ] || convox_build_cmd+=( --description "$BUILDKITE_PLUGIN_CONVOX_BUILD_DESCRIPTION" )
 ! "${BUILDKITE_PLUGIN_CONVOX_BUILD_DEVELOPMENT-false}"   || convox_build_cmd+=( --development )
   "${BUILDKITE_PLUGIN_CONVOX_BUILD_CACHE-true}"          || convox_build_cmd+=( --no-cache )
 
 echo "--- Creating Convox release"
 
-echo stat "$BUILDKITE_PLUGIN_CONVOX_BUILD_MANIFEST"
-stat "$BUILDKITE_PLUGIN_CONVOX_BUILD_MANIFEST" || true
+echo stat "$(pwd)/${BUILDKITE_PLUGIN_CONVOX_BUILD_MANIFEST}"
+stat "$(pwd)/${BUILDKITE_PLUGIN_CONVOX_BUILD_MANIFEST}" || true
 
 printf "$ " && printf '%q ' "${convox_build_cmd[@]}" && echo
 convox_build_output="$("${convox_build_cmd[@]}" | tee /dev/stderr)"
