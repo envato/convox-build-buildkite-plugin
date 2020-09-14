@@ -32,3 +32,17 @@ steps:
 
   - command: buildkite-agent meta-data get convox-release-id
 ```
+
+## Troubleshooting
+
+### Manifest not found
+
+```shell
+$ convox build --rack myrack --app myapp
+Packaging source... OK
+Uploading source... OK
+Starting build... OK
+ERROR: open convox.yml: no such file or directory
+```
+
+As of Convox CLI `3.0.39`, listing the manifest file in a local `.dockerignore` prevents the file from being loaded by the build process, even if it can be found via a local `stat` or similar. This behaviour has not been observed in version `20200903164833`.
